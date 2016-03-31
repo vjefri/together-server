@@ -1,0 +1,38 @@
+{
+  "name": "together",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --harmony index.js",
+    "test": "mocha --recursive ./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imbrian/together.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imbrian/together/issues"
+  },
+  "homepage": "https://github.com/imbrian/together#readme",
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "body-parser": "^1.15.0",
+    "bookshelf": "^0.9.2",
+    "express": "^4.13.4",
+    "knex": "^0.10.0",
+    "passport": "^0.3.2",
+    "passport-github": "^1.1.0",
+    "socket.io": "^1.4.5",
+    "ws": "^1.0.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "morgan": "^1.7.0",
+    "supertest": "^1.2.0",
+    "supertest-as-promised": "^3.0.0"
+  }
+}
