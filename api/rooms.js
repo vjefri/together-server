@@ -5,7 +5,7 @@ const API = require('../lib/api');
 /* GET /rooms */
 router.get('/', function (req, res) {
   Room.fetchAll()
-      .then(API.sendResponse(200, res));
+    .then(API.sendResponse(200, res));
 });
 
 /* POST /rooms */
@@ -21,12 +21,17 @@ router.post('/', function (req, res) {
 
 /* GET /rooms/:id */
 router.get('/:id', function (req, res) {
-  res.sendStatus(200);
+  Room.findByUrl(req.params.id)
+    .then(API.sendResponse(200, res))
+    .catch(API.sendResponse(404, res));
 });
 
 /* PUT /rooms/:id */
 router.put('/:id', function (req, res) {
-  res.sendStatus(201);
+  Room.findByUrl(req.params.id)
+    .then(room => room.update(req.body))
+    .then(API.sendResponse(200, res))
+    .catch(API.sendResponse(404, res));
 });
 
 module.exports = router;

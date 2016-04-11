@@ -35,6 +35,7 @@ knex.schema.hasTable('rooms').then(function(exists) {
       room.increments('id').primary();
       room.string('url', 16);
       room.boolean('private');
+      room.string('code', 2000);
       room.integer('owner')
           .references('id')
           .inTable('users');
