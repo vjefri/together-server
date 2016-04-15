@@ -11,22 +11,27 @@ const User = module.exports = db.Model.extend({
   }
 });
 
+User.create = function(user) {
+  return User.hashPassword(user.password)
+    .then(hash => {
+      return new User({
+        email: user.email,
+        password: hash
+      })
+    })
+    .then(user => user.save({ require: true }))
+    .then(user)
+    .catch(Promise.reject(err));
+};
+
 User.hashPassword = function(password) {
   return bcrypt.hashAsync(password, null, null)
-    .then(function(hash) {
-      return hash;
-    })
-    .catch(function(err) {
-      return Promise.reject(err);
-    });
+    .then(hash)
+    .catch(Promise.reject(err));
 };
 
 User.compareHash = function(password, hash) {
-  return bcrypt.compare(password, hash)
-    .then(function(res) {
-      return res;
-    })
-    .catch(function(err) {
-      return Promise.reject(err);
-    })
+  return bcrypt.compareAsync(password, hash)
+    .then(res)
+    .catch(Promise.reject(err))
 };

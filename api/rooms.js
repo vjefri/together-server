@@ -11,7 +11,7 @@ router.get('/', function (req, res) {
 /* POST /rooms */
 router.post('/', function (req, res) {
   const room = {
-    user_id: req.decoded,
+    user_id: req.user,
     private: req.body.private
   };
 
@@ -23,7 +23,7 @@ router.post('/', function (req, res) {
 router.get('/:id', function (req, res) {
   Room.findByUrl(req.params.id)
     .then(API.sendResponse(200, res))
-    .catch(API.sendResponse(404, res));
+    .catch(Room.NotFoundError, API.sendResponse(404, res));
 });
 
 /* PUT /rooms/:id */
