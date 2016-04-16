@@ -3,18 +3,24 @@ const mocha = require('mocha');
 const expect = require('chai').expect;
 const app = require('../index');
 const Room = require('../models/room');
+const jwt = require('jsonwebtoken');
 
 describe('Rooms API', function() {
+
+  var token = jwt.sign({ sub: 'test_user' },
+    new Buffer(process.env.TOKEN_SECRET, 'base64'), { audience: process.env.TOKEN_AUDIENCE });
 
   it('returns all rooms', function(done) {
     request(app)
       .get('/api/rooms')
+      .set('Authorization', `Bearer ${token}`)
       .expect(200, done);
   });
 
   it('creates a new room', function(done) {
     request(app)
       .post('/api/rooms')
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .end(function(err, res) {
         const room = res.body;
@@ -38,6 +44,7 @@ describe('Rooms API', function() {
       .then(function(roomId) {
         request(app)
           .get(`/api/rooms/${roomId}`)
+          .set('Authorization', `Bearer ${token}`)
           .expect(200)
           .end(function(err, res) {
             const room = res.body;
@@ -49,7 +56,5 @@ describe('Rooms API', function() {
             done();
           });
       });
-
-
-  })
+  });
 });
