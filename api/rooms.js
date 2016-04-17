@@ -10,12 +10,7 @@ router.get('/', function (req, res) {
 
 /* POST /rooms */
 router.post('/', function (req, res) {
-  const room = {
-    user_id: req.user,
-    private: req.body.private
-  };
-
-  Room.buildRoom(room)
+  Room.buildRoom(req.user.sub)
     .then(API.sendResponse(201, res));
 });
 
