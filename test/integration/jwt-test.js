@@ -1,7 +1,7 @@
 const request = require('supertest');
 const mocha = require('mocha');
 const expect = require('chai').expect;
-const app = require('../index');
+const app = require('../../index');
 const jwt = require('jsonwebtoken');
 
 describe('Token authentication', function() {

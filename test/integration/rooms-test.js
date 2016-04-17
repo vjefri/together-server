@@ -1,8 +1,8 @@
 const request = require('supertest');
 const mocha = require('mocha');
 const expect = require('chai').expect;
-const app = require('../index');
-const Room = require('../models/room');
+const app = require('../../index');
+const Room = require('../../models/room');
 const jwt = require('jsonwebtoken');
 
 describe('Rooms API', function() {
@@ -23,7 +23,7 @@ describe('Rooms API', function() {
       .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .end(function(err, res) {
-        const room = res.body;
+        const room = res.body.room;
         const keys = Object.keys(room);
 
         expect(keys.length).to.equal(5);
@@ -47,7 +47,7 @@ describe('Rooms API', function() {
           .set('Authorization', `Bearer ${token}`)
           .expect(200)
           .end(function(err, res) {
-            const room = res.body;
+            const room = res.body.room;
             const keys = Object.keys(room);
 
             expect(keys.length).to.equal(5);

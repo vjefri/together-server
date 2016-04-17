@@ -20,9 +20,7 @@ knex.schema.hasTable('users').then(function(exists) {
   if (!exists) {
     knex.schema.createTable('users', function (user) {
       user.increments('id').primary();
-      user.string('username', 32);
-      user.string('email', 64);
-      user.string('password', 64);
+      user.string('github_id', 48);
     }).then(function (table) {
       console.log('Created Table', table);
     });
@@ -34,7 +32,6 @@ knex.schema.hasTable('rooms').then(function(exists) {
     knex.schema.createTable('rooms', function (room) {
       room.increments('id').primary();
       room.string('url', 16);
-      room.boolean('private');
       room.string('code', 2000);
       room.integer('owner')
           .references('id')

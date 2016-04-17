@@ -23,7 +23,7 @@ Room.buildRoom = function(params) {
   return new Room({
     url: shortid.generate(),
     private: params.private || false,
-    owner: params.user_id || 9999, //TODO
+    owner: params.user_id,
     code: params.code || ''
   }).save();
 };
