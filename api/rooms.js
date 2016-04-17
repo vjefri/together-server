@@ -1,17 +1,20 @@
 const router = require('express').Router();
 const Room = require('../models/room');
+const User = require('../models/user');
 const API = require('../lib/api');
 
 /* GET /rooms */
 router.get('/', function (req, res) {
-  Room.fetchAll()
-    .then(API.sendResponse(200, res));
+  Room.findAllForUser(req.user.sub)
+    .then(API.sendResponse(200, res))
+    .catch(User.NotFoundError, API.sendResponse(404, res));
 });
 
 /* POST /rooms */
 router.post('/', function (req, res) {
   Room.buildRoom(req.user.sub)
-    .then(API.sendResponse(201, res));
+    .then(API.sendResponse(201, res))
+    .catch(User.NotFoundError, API.sendResponse(404, res));
 });
 
 /* GET /rooms/:id */

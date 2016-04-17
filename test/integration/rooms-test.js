@@ -19,13 +19,6 @@ describe('Rooms API', function() {
       });
   });
 
-  it('returns all rooms', function(done) {
-    request(app)
-      .get('/api/rooms')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200, done);
-  });
-
   it('creates a new room', function(done) {
     request(app)
       .post('/api/rooms')
@@ -87,5 +80,22 @@ describe('Rooms API', function() {
                 });
             });
       });
+  });
+
+  it('should return a user\'s rooms', function(done) {
+    request(app)
+      .get('/api/rooms')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .end(function(err, res) {
+        var rooms = res.body.rooms;
+
+        expect(rooms).to.have.length(3);
+
+        rooms.forEach(room => {
+          expect(room.url).to.be.a('string');
+        });
+        done();
+      })
   });
 });

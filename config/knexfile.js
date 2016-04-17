@@ -30,8 +30,7 @@ knex.schema.hasTable('rooms').then(function(exists) {
       room.string('url', 16);
       room.string('code', 2000);
       room.integer('owner')
-          .references('id')
-          .inTable('users');
+          .references('users.id');
     }).then(function (table) {
       console.log('Created Table', table);
     });

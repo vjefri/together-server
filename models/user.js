@@ -1,5 +1,4 @@
-require('./room');
-
+const Room = require('./room');
 const db = require('../config/db');
 const Promise = require('bluebird');
 const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
@@ -8,7 +7,7 @@ const util = require('util');
 const User = module.exports = db.Model.extend({
   tableName: 'users',
   rooms() {
-    return this.hasMany('Room');
+    return this.hasMany(Room);
   }
 });
 
@@ -21,7 +20,12 @@ User.create = function(user_id) {
       }
       return new User({
         github_id: user_id.sub
-      }).save();
+      }).save()
+        .then(user => {
+          return {
+            user: user
+          };
+        });
     });
 };
 
