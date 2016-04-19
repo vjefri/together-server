@@ -25,10 +25,15 @@ describe('Users API', function() {
       });
   });
 
-  it('should return 409 if a user with uuid already exists', function(done) {
+  it('should return user if it already exists', function(done) {
     request(app)
       .post('/api/users')
       .set('Authorization', `Bearer ${token}`)
-      .expect(409, done);
-  })
+      .end(function(err, res) {
+        var user = res.body.user;
+
+        expect(user.github_id).to.equal('users_test_user');
+        done();
+      });
+  });
 });

@@ -6,7 +6,6 @@ router.post('/', function(req, res) {
   User.create(req.user)
     .then(API.sendResponse(201, res))
     .catch(User.NoRowsUpdatedError, API.sendResponse(500, res))
-    .catch(User.UserAlreadyExistsError, API.sendResponse(409, res));
 });
 
 module.exports = router;

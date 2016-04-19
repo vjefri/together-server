@@ -16,7 +16,9 @@ User.create = function(user_id) {
     .fetch()
     .then(user => {
       if (user) {
-        return Promise.reject(new User.UserAlreadyExistsError());
+        return {
+          user: user
+        };
       }
       return new User({
         github_id: user_id.sub
@@ -28,11 +30,3 @@ User.create = function(user_id) {
         });
     });
 };
-
-User.UserAlreadyExistsError = function() {
-  Error.captureStackTrace(this, this.constructor);
-  this.name = 'UserAlreadyExists';
-  this.message = 'A user with that uuid already exists';
-  this.status = 409;
-}
-util.inherits(User.UserAlreadyExistsError, Error);
