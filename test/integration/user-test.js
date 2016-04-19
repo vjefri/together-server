@@ -36,4 +36,18 @@ describe('Users API', function() {
         done();
       });
   });
+
+  it('should return the current user for GET /users/me', function(done) {
+    request(app)
+      .get('/api/users/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .end(function(err, res) {
+        var user = res.body.user;
+
+        expect(user.id).to.equal('me');
+        expect(user.github_id).to.equal('users_test_user');
+        done();
+      });
+  })
 });

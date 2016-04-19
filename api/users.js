@@ -8,4 +8,10 @@ router.post('/', function(req, res) {
     .catch(User.NoRowsUpdatedError, API.sendResponse(500, res))
 });
 
+router.get('/me', function(req, res) {
+  User.findMe(req.user)
+    .then(API.sendResponse(200, res))
+    .catch(User.NotFoundError, API.sendResponse(404, res));
+});
+
 module.exports = router;

@@ -16,6 +16,8 @@ User.create = function(user_id) {
     .fetch()
     .then(user => {
       if (user) {
+        user.set('uuid', user.get('id'));
+        user.set('id', 'me');
         return {
           user: user
         };
@@ -24,9 +26,27 @@ User.create = function(user_id) {
         github_id: user_id.sub
       }).save()
         .then(user => {
+          user.set('uuid', user.get('id'));
+          user.set('id', 'me');
           return {
             user: user
           };
         });
+    });
+};
+
+User.findMe = function(user_id) {
+  return User.where('github_id', user_id.sub)
+    .fetch()
+    .then(user => {
+      if (user) {
+        user.set('uuid', user.get('id'));
+        user.set('id', 'me');
+        return {
+          user: user
+        };
+      } else {
+        return Promise.reject(new User.NotFoundError());
+      }
     });
 };
