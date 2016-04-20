@@ -12,7 +12,7 @@ io.sockets.on('connection', jwt.authorize(jwtOptions))
   .on('authenticated',  function(socket) {
     socket.on('join', function(data) {
       socket.join(data.url);
-      socket.broadcast.to(data.url).emit('newUser');
+      socket.broadcast.to(data.url).emit('newUser', { newUser: data.user });
     });
 
     socket.on('update', function(data) {

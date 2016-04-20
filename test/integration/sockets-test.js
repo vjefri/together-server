@@ -24,6 +24,7 @@ describe('Sockets', function() {
 
       client.on('unauthorized', function(data) {
         expect(data.data.code).to.equal('invalid_token');
+        client.disconnect();
         done();
       });
     });
@@ -55,9 +56,51 @@ describe('Sockets', function() {
               clientOne.emit('update', { url: workspace, code: testCode });
 
               clientTwo.on('incoming', function(data) {
-                expect(data.code).to.equal(testCode)
+                expect(data.code).to.equal(testCode);
+                clientOne.disconnect();
+                clientTwo.disconnect();
                 done();
               });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  it('should send send username when new user joins a room', function(done) {
+    var clientOne = io.connect(socketUrl, options);
+    var clientTwo;
+    var clientOneToken = jwt.sign({ sub: 'sockets_user_one' },
+      new Buffer(process.env.TOKEN_SECRET, 'base64'), { audience: process.env.TOKEN_AUDIENCE });
+    var clientTwoToken = jwt.sign({ sub: 'sockets_user_two' },
+      new Buffer(process.env.TOKEN_SECRET, 'base64'), { audience: process.env.TOKEN_AUDIENCE });
+
+    clientOne.on('connect', function() {
+      clientOne.emit('authenticate', { token: clientOneToken });
+
+      clientOne.on('authenticated', function() {
+        clientOne.emit('join', {
+          url: workspace,
+          user: 'sockets_user_one'
+        });
+
+        clientTwo = io.connect(socketUrl, options);
+
+        clientTwo.on('connect', function() {
+          clientTwo.emit('authenticate', { token: clientTwoToken });
+
+          clientTwo.on('authenticated', function() {
+            clientTwo.emit('join', {
+              url: workspace,
+              user: 'sockets_user_two'
+            });
+
+            clientOne.on('newUser', function(data) {
+              expect(data.newUser).to.equal('sockets_user_two');
+              clientOne.disconnect();
+              clientTwo.disconnect();
+              done()
             });
           });
         });
