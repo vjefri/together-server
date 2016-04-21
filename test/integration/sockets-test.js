@@ -42,7 +42,10 @@ describe('Sockets', function() {
       clientOne.emit('authenticate', { token: clientOneToken });
 
       clientOne.on('authenticated', function() {
-        clientOne.emit('join', { url: workspace });
+        clientOne.emit('join', {
+          url: workspace,
+          user: { github_id: 'sockets_user_one', username: 'one_username' }
+        });
 
         clientTwo = io.connect(socketUrl, options);
 
@@ -50,7 +53,10 @@ describe('Sockets', function() {
           clientTwo.emit('authenticate', { token: clientTwoToken });
 
           clientTwo.on('authenticated', function() {
-            clientTwo.emit('join', { url: workspace });
+            clientTwo.emit('join', {
+              url: workspace,
+              user: { github_id: 'sockets_user_two', username: 'two_username' }
+            });
 
             clientOne.on('newUser', function() {
               clientOne.emit('update', { url: workspace, code: testCode });
@@ -82,7 +88,7 @@ describe('Sockets', function() {
       clientOne.on('authenticated', function() {
         clientOne.emit('join', {
           url: workspace,
-          user: 'sockets_user_one'
+          user: { github_id: 'sockets_user_one', username: 'one_username' }
         });
 
         clientTwo = io.connect(socketUrl, options);
@@ -93,11 +99,12 @@ describe('Sockets', function() {
           clientTwo.on('authenticated', function() {
             clientTwo.emit('join', {
               url: workspace,
-              user: 'sockets_user_two'
+              user: { github_id: 'sockets_user_two', username: 'two_username' }
             });
 
             clientOne.on('newUser', function(data) {
-              expect(data.newUser).to.equal('sockets_user_two');
+              expect(data.newUser.github_id).to.equal('sockets_user_two');
+              expect(data.newUser.username).to.equal('two_username');
               clientOne.disconnect();
               clientTwo.disconnect();
               done()

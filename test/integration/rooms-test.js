@@ -96,6 +96,34 @@ describe('Rooms API', function() {
           expect(room.url).to.be.a('string');
         });
         done();
-      })
+      });
+  });
+
+  it('should return an empty array if a user has no rooms', function(done) {
+    var token = jwt.sign({ sub: 'second_room_test_user' },
+      new Buffer(process.env.TOKEN_SECRET, 'base64'), { audience: process.env.TOKEN_AUDIENCE });
+
+    TestHelper.seedUser({ github_id: 'second_room_test_user' })
+      .then(() => {
+        request(app)
+          .get('/api/rooms')
+          .set('Authorization', `Bearer ${token}`)
+          .expect(200)
+          .end(function(err, res) {
+            var rooms = res.body.rooms;
+
+            expect(rooms).to.be.an('array');
+            expect(rooms).to.have.length(0);
+
+            User.where('github_id', 'second_room_test_user')
+              .fetch({ withRelated: ['rooms'] })
+              .then(user => {
+                var rooms = user.related('rooms');
+
+                expect(rooms).to.have.length(0);
+                done();
+              });
+          });
+      });
   });
 });

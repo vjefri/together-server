@@ -4,6 +4,7 @@ const expect = require('chai').expect;
 const app = require('../../index');
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
+const TestHelper = require('../test-helper');
 
 describe('Users API', function() {
 
@@ -45,9 +46,21 @@ describe('Users API', function() {
       .end(function(err, res) {
         var user = res.body.user;
 
-        expect(user.id).to.equal('me');
         expect(user.github_id).to.equal('users_test_user');
         done();
       });
-  })
+  });
+
+  it ('should return 403 if requesting another user', function(done) {
+    User.forge({
+      github_id: 'another_test_user'
+    })
+    .save()
+    .then(user => {
+      request(app)
+        .get('/api/users/' + user.id)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(403, done);
+    });
+  });
 });

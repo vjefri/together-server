@@ -3,14 +3,14 @@ const shortid = require('shortid');
 const Promise = require('bluebird');
 const db = require('../config/db');
 
-const Room = module.exports = db.Model.extend({
+const Room = db.Model.extend({
   tableName: 'rooms',
   owner() {
-    return this.belongsTo(User);
+    return this.belongsTo('User');
   },
-  // users() {
-  //   return this.hasMany(User);
-  // },
+  viewers() {
+    return this.hasMany('User');
+  },
   update(params) {
     return this.save(params, { patch: true })
       .then(room => {
@@ -20,6 +20,8 @@ const Room = module.exports = db.Model.extend({
       });
   }
 });
+
+module.exports = db.model('Room', Room);
 
 Room.buildRoom = function(user_id) {
   return User.where('github_id', user_id)
@@ -54,15 +56,10 @@ Room.findByUrl = function(url) {
 
 Room.findAllForUser = function(user_id) {
   return User.where({ github_id: user_id })
-    .fetch()
+    .fetch({ withRelated: ['rooms'] })
     .then(user => {
-      return Room.where({ owner: user.get('id') })
-        .fetchAll()
-        .then(rooms => rooms);
-    })
-    .then(rooms => {
       return {
-        rooms: rooms
+        rooms: user.related('rooms')
       };
     })
     .catch(err => {

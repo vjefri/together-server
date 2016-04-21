@@ -5,7 +5,7 @@ const User = require('../models/user');
 const TestHelper = {};
 const tables = ['rooms', 'users'];
 
-TestHelper.dropTables = function(tableName) {
+TestHelper.dropTables = function() {
   return Promise.each(tables, table => {
     return knex(table).truncate();
   });

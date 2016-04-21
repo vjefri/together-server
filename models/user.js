@@ -4,20 +4,20 @@ const Promise = require('bluebird');
 const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 const util = require('util');
 
-const User = module.exports = db.Model.extend({
+const User = db.Model.extend({
   tableName: 'users',
   rooms() {
-    return this.hasMany(Room);
+    return this.hasMany('Room', 'owner');
   }
 });
+
+module.exports = db.model('User', User);
 
 User.create = function(user_id) {
   return User.where('github_id', user_id.sub)
     .fetch()
     .then(user => {
       if (user) {
-        user.set('uuid', user.get('id'));
-        user.set('id', 'me');
         return {
           user: user
         };
@@ -26,8 +26,6 @@ User.create = function(user_id) {
         github_id: user_id.sub
       }).save()
         .then(user => {
-          user.set('uuid', user.get('id'));
-          user.set('id', 'me');
           return {
             user: user
           };
@@ -40,8 +38,6 @@ User.findMe = function(user_id) {
     .fetch()
     .then(user => {
       if (user) {
-        user.set('uuid', user.get('id'));
-        user.set('id', 'me');
         return {
           user: user
         };
@@ -50,3 +46,29 @@ User.findMe = function(user_id) {
       }
     });
 };
+
+User.isCurrentUser = function(id, user_id) {
+  return User.where('github_id', user_id.sub)
+    .fetch()
+    .then(user => {
+      if (user) {
+        if (user.get('id') === id) {
+          return {
+            user: user
+          };
+        } else {
+          return Promise.reject(new User.ForbiddenRequest())
+        }
+      } else {
+        return Promise.reject(new User.NotFoundError());
+      }
+    });
+};
+
+User.ForbiddenRequest = function() {
+  Error.captureStackTrace(this, this.constructor);
+  this.name = 'ForbiddenRequest';
+  this.message = 'Forbidden request for a user';
+  this.status = 403;
+};
+util.inherits(User.ForbiddenRequest, Error);
