@@ -57,7 +57,7 @@ User.isCurrentUser = function(id, user_id) {
             user: user
           };
         } else {
-          return Promise.reject(new User.ForbiddenRequest())
+          return Promise.reject(new User.ForbiddenRequestError())
         }
       } else {
         return Promise.reject(new User.NotFoundError());
@@ -65,10 +65,10 @@ User.isCurrentUser = function(id, user_id) {
     });
 };
 
-User.ForbiddenRequest = function() {
+User.ForbiddenRequestError = function() {
   Error.captureStackTrace(this, this.constructor);
   this.name = 'ForbiddenRequest';
   this.message = 'Forbidden request for a user';
   this.status = 403;
 };
-util.inherits(User.ForbiddenRequest, Error);
+util.inherits(User.ForbiddenRequestError, Error);

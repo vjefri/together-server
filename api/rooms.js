@@ -21,15 +21,16 @@ router.post('/', function (req, res) {
 router.get('/:id', function (req, res) {
   Room.findByUrl(req.params.id)
     .then(API.sendResponse(200, res))
-    .catch(Room.NotFoundError, API.sendResponse(404, res));
+    .catch(Room.NotFoundError, API.sendResponse(404, res))
+    .catch(Room.NoRowsUpdatedError, API.sendResponse(400, res));
 });
 
 /* PUT /rooms/:id */
 router.put('/:id', function (req, res) {
   Room.findByUrl(req.params.id)
-    .then(room => room.update(req.body))
+    .then(room => room.room.update(req.body.room, req.user.sub))
     .then(API.sendResponse(200, res))
-    .catch(API.sendResponse(404, res));
+    .catch(Room.ForbiddenRequestError, API.sendResponse(403, res));
 });
 
 module.exports = router;

@@ -17,7 +17,7 @@ router.get('/me', function(req, res) {
 router.get('/:id', function(req, res) {
   User.isCurrentUser(req.params.id, req.user)
     .then(API.sendResponse(200, res))
-    .catch(User.ForbiddenRequest, API.sendResponse(403, res));
+    .catch(User.ForbiddenRequestError, API.sendResponse(403, res));
 })
 
 module.exports = router;

@@ -28,7 +28,7 @@ describe('Rooms API', function() {
         const room = res.body.room;
         const keys = Object.keys(room);
 
-        expect(keys.length).to.equal(4);
+        expect(keys.length).to.equal(6);
         expect(room.url).to.be.a('string');
         done();
       });
@@ -51,7 +51,7 @@ describe('Rooms API', function() {
             const room = res.body.room;
             const keys = Object.keys(room);
 
-            expect(keys.length).to.equal(4);
+            expect(keys.length).to.equal(6);
             expect(room.url).to.equal('abc123');
             expect(room.code).to.equal('One fish, two fish');
             done();
@@ -125,5 +125,103 @@ describe('Rooms API', function() {
               });
           });
       });
+  });
+
+  it('should update room code', function(done) {
+
+    request(app)
+      .put('/api/rooms/abc123')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        room: {
+          code: 'Red fish, blue fish'
+        }
+      })
+      .expect(201)
+      .end(function(err, res) {
+        Room.where('url', 'abc123')
+          .fetch()
+          .then(room => {
+            expect(room.get('code')).to.equal('Red fish, blue fish');
+            done();
+          });
+      });
+  });
+
+  it('should update room name', function(done) {
+
+    request(app)
+      .put('/api/rooms/abc123')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        room: {
+          name: 'Hello'
+        }
+      })
+      .expect(201)
+      .end(function(err, res) {
+        Room.where('url', 'abc123')
+          .fetch()
+          .then(room => {
+            expect(room.get('name')).to.equal('Hello');
+            done();
+          });
+      });
+  });
+
+  it('should not edit the room url', function(done) {
+    request(app)
+      .put('/api/rooms/abc123')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        room: {
+          url: 'zyx321',
+          owner: 1,
+          code: 'One fish, two fish',
+          name: 'Hello',
+          language: 'javascript'
+        }
+      })
+      .expect(403)
+      .end(function(err, res) {
+        Room.where('url', 'abc123')
+          .fetch()
+          .then(room => {
+            expect(room).to.be.ok;
+            expect(room.get('url')).to.equal('abc123');
+            done();
+          });
+      });
+  });
+
+  it('should not allow non-owners to change workspace name', function(done) {
+
+    var token = jwt.sign({ sub: 'second_room_test_user' },
+      new Buffer(process.env.TOKEN_SECRET, 'base64'), { audience: process.env.TOKEN_AUDIENCE });
+
+    Room.forge({
+      url: 'xyz123',
+      owner: 1,
+      code: 'One fish, two fish',
+      name: 'Hello',
+      language: 'javascript'
+    })
+    .save()
+    .then(() => {
+      request(app)
+        .put('/api/rooms/xyz123')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          room: {
+            url: 'xyz123',
+            owner: 1,
+            code: 'One fish, two fish',
+            name: 'Goodbye',
+            language: 'javascript'
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .expect(403, done);
+    });
   });
 });
