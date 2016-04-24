@@ -34,7 +34,7 @@ TestHelper.buildNRooms = function(n) {
       .then(() => value+1)
       .then(loop);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }(0);
 };
 

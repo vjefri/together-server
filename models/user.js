@@ -1,7 +1,6 @@
 const Room = require('./room');
 const db = require('../config/db');
 const Promise = require('bluebird');
-const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 const util = require('util');
 
 const User = db.Model.extend({
@@ -57,7 +56,7 @@ User.isCurrentUser = function(id, user_id) {
             user: user
           };
         } else {
-          return Promise.reject(new User.ForbiddenRequestError())
+          return Promise.reject(new User.ForbiddenRequestError());
         }
       } else {
         return Promise.reject(new User.NotFoundError());
